@@ -38,6 +38,7 @@ var deploymentStorageContainerName = 'app-package-${take(appName, 32)}-${take(re
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
 var principalIds = !empty(principalId) ? [processorUserAssignedIdentity.outputs.principalId, principalId] : [processorUserAssignedIdentity.outputs.principalId]
+var principalTypes = !empty(principalId) ? ['ServicePrincipal', 'User'] : ['ServicePrincipal']
 
 // Organize resources in a resource group
 resource rg 'Microsoft.Resources/resourceGroups@2021-04-01' = {
@@ -121,6 +122,7 @@ module storageBlobDataOwnerRoleDefinitionApi 'app/storage-Access.bicep' = [for r
     storageAccountName: storage.outputs.name
     roleId: roleId
     principalIds: principalIds
+    principalTypes: principalTypes
   }
 }]
 
@@ -168,6 +170,7 @@ module ServiceBusDataOwnerRoleAssignment 'app/servicebus-Access.bicep' = [for ro
     serviceBusNamespaceName: serviceBus.outputs.name
     roleDefinitionId: roleId
     principalIds: principalIds
+    principalTypes: principalTypes
   }
 }]
 
@@ -179,6 +182,7 @@ module appInsightsMetricsPublisherRole 'app/appinsights-Access.bicep' = {
     applicationInsightsName: monitoring.outputs.name
     roleId: '3913510d-42f4-4e42-8a64-420c390055eb' // Monitoring Metrics Publisher
     principalIds: principalIds
+    principalTypes: principalTypes
   }
 }
 
